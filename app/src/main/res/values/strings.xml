@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Wifi Finder</string>
+    <string name="check_network">Check your network connectivity!</string>
+    <string name="no_device_found">No devices found</string>
+</resources>
