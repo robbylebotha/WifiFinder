@@ -3,13 +3,14 @@ package it.ads.app.wififinder.views;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
@@ -17,8 +18,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -30,6 +29,7 @@ import it.ads.app.wififinder.R;
 import it.ads.app.wififinder.adapters.DeviceRecycleViewAdapter;
 import it.ads.app.wififinder.models.DeviceData;
 import it.ads.app.wififinder.recievers.WifiBroadcastReciever;
+import it.ads.app.wififinder.services.WifiService;
 import it.ads.app.wififinder.viewmodels.DeviceDataViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     WifiManager wifiManager;
     String TAG = "8888";
     private final int REQUEST_CODE_ASK_PERMISSIONS = 1;
-//    LinearLayout progressBar;
     CheckConnectivity checkConnectivity;
     RecyclerView deviceRecycleViewer;
     DeviceDataViewModel deviceViewModel;
@@ -67,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
             wifiManager.setWifiEnabled(true);
         }else{
             // start broadcast receiver
-            wifiReceiver = new WifiBroadcastReciever(wifiManager);
+            wifiReceiver = new WifiBroadcastReciever();
+            startWifiService();
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Start service to scan for wifi devices every x minutes
+     */
+    private void startWifiService(){
+        Intent intent = new Intent(this, WifiService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        Log.e(TAG, "Service Started");
+    }
+
+    /**
      * From API level 23 (Android 6.0 Marshmallow) we need to ask Run-time
      * permission from the user-end
      */
@@ -132,6 +143,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 //        unregisterReceiver(wifiReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiReceiver);
     }
 
     public void onResume(){

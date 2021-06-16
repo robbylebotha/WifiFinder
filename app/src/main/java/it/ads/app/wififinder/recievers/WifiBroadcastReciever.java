@@ -6,21 +6,13 @@ import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import it.ads.app.wififinder.Networking.SendData;
 import it.ads.app.wififinder.R;
-import it.ads.app.wififinder.adapters.CustomAdapter;
 import it.ads.app.wififinder.models.DeviceData;
 import it.ads.app.wififinder.viewmodels.DeviceDataViewModel;
 
@@ -33,9 +25,7 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
     String TAG = "8888";
     DeviceDataViewModel deviceDataViewModel;
 
-    public WifiBroadcastReciever(WifiManager wifiManager){
-
-        this.wifiManager = wifiManager;
+    public WifiBroadcastReciever(){
 
     }
 
@@ -46,6 +36,7 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.i(TAG, "Wifi onReceive "+action);
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
         boolean detectedWifiDevice = intent.getBooleanExtra(wifiManager.EXTRA_RESULTS_UPDATED, false);
         Log.i(TAG, "Scan Complete! Intent Extra: "+detectedWifiDevice);

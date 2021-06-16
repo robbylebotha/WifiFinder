@@ -17,6 +17,10 @@
         android:roundIcon="@drawable/ic_wifi"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".services.WifiService"
+            android:enabled="true"
+            android:exported="true"></service>
         <activity android:name=".views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
