@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 
 import it.ads.app.wififinder.recievers.WifiBroadcastReciever;
 
+/**
+ * Service to periodically scan for wifi device in background
+ */
 public class WifiService extends Service {
     String TAG = "8888";
     WifiManager wifiManager;
@@ -39,5 +42,6 @@ public class WifiService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(wifiReceiver);
+        Log.e(TAG, "Service: onDestroy()");
     }
 }
