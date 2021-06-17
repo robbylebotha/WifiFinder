@@ -18,6 +18,7 @@ import it.ads.app.wififinder.viewmodels.DeviceDataViewModel;
 
 /**
  * Listen to wifi system broadcast
+ * @author RLB
  */
 public class WifiBroadcastReciever extends BroadcastReceiver {
     WifiManager wifiManager;

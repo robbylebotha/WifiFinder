@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
             registerReceiver(wifiReceiver, intentFilter);
             wifiManager.startScan();
+            startWifiService();
         }
     }
 
