@@ -44,18 +44,7 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
         boolean detectedWifiDevice = intent.getBooleanExtra(wifiManager.EXTRA_RESULTS_UPDATED, false);
         Log.i(TAG, "Scan Complete! Intent Extra: "+detectedWifiDevice);
 
-        //this is a really dirty fix but im out of options for now
-        //when reciever is called from service a ClassCastException is thrown
-        //but when called from activty, it works fine. So this hack allows it to work from
-        //both ends.
-        //TODO read up and fix this issue
-        try{
-            deviceDataViewModel = ViewModelProviders.of((FragmentActivity) context).get(DeviceDataViewModel.class);
-        }catch (Exception e){
-            Log.e(TAG, e.toString());
-            return;
-        }
-
+        deviceDataViewModel = ViewModelProviders.of((FragmentActivity) context).get(DeviceDataViewModel.class);
 
         if (detectedWifiDevice) {
             List<ScanResult> wifiList = wifiManager.getScanResults();
