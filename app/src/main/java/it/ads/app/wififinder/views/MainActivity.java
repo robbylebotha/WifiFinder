@@ -55,19 +55,19 @@ public class MainActivity extends AppCompatActivity {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         checkConnectivity = new CheckConnectivity(getApplicationContext());
 
+
         //set adapter and observer
         deviceViewModel = ViewModelProviders.of(context).get(DeviceDataViewModel.class);
         deviceRecycleViewer.setLayoutManager(new LinearLayoutManager(context));
         deviceViewModel.getDeviceMutableLiveData().observe(context,deviceListUpdateObserver);
-
 
         if (!wifiManager.isWifiEnabled()) {
             Toast.makeText(getApplicationContext(), "Turning WiFi ON...", Toast.LENGTH_LONG).show();
             wifiManager.setWifiEnabled(true);
         }else{
             // start broadcast receiver
-            wifiReceiver = new WifiBroadcastReciever();
-            startWifiService();
+            wifiReceiver = new WifiBroadcastReciever(wifiManager);
+            scanForWifi();
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -95,16 +95,24 @@ public class MainActivity extends AppCompatActivity {
      * Start scanning for wifi devices
      */
     private void scanForWifi(){
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_ASK_PERMISSIONS);
-        } else {
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-            registerReceiver(wifiReceiver, intentFilter);
-            wifiManager.startScan();
-            startWifiService();
+
+        if ( Build.VERSION.SDK_INT >= 23){
+            if (ActivityCompat.checkSelfPermission(context, Manifest.
+                    permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED ){
+                requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+                Log.i(TAG, "User location NOT ENABLED, waiting for permission");
+
+            }else{
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+                registerReceiver(wifiReceiver, intentFilter);
+                wifiManager.startScan();
+            }
         }
     }
 
@@ -116,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        Log.e(TAG, "Service Started");
+        Log.i(TAG, "Service Started");
     }
 
     /**
@@ -143,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        unregisterReceiver(wifiReceiver);
+//        startWifiService();
     }
 
     @Override
@@ -160,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-
         scanForWifi();
     }
 

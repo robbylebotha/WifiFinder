@@ -10,8 +10,9 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import it.ads.app.wififinder.viewmodels.DeviceDataViewModel;
-
+/**
+ * Create a notification when bg service detects wifi devices
+ */
 public class Notifications {
     Context context;
 
@@ -28,9 +29,9 @@ public class Notifications {
             @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
+            notificationChannel.setDescription("Found Wifi Devices");
             notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setLightColor(Color.BLUE);
             notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);

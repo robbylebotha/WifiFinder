@@ -15,6 +15,7 @@ import it.ads.app.wififinder.Networking.SendData;
 import it.ads.app.wififinder.R;
 import it.ads.app.wififinder.models.DeviceData;
 import it.ads.app.wififinder.viewmodels.DeviceDataViewModel;
+import it.ads.app.wififinder.views.MainActivity;
 
 /**
  * Listen to wifi system broadcast
@@ -26,8 +27,9 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
     String TAG = "8888";
     DeviceDataViewModel deviceDataViewModel;
 
-    public WifiBroadcastReciever(){
-
+    public WifiBroadcastReciever(WifiManager wifiManager){
+        this.wifiManager = wifiManager;
+        Log.i(TAG, "WifiBroadcastReciever()");
     }
 
     @Override
@@ -45,7 +47,7 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
 
         if (detectedWifiDevice) {
             List<ScanResult> wifiList = wifiManager.getScanResults();
-            Log.i(TAG, "Found device: "+wifiList.size());
+            Log.i(TAG, "getScanResults size: "+wifiList.size());
             deviceData = new ArrayList<>();
             for (ScanResult scanResult : wifiList) {
                 Log.i(TAG, "BSSID: "+scanResult.BSSID+"\nName: "+scanResult.SSID
@@ -55,8 +57,8 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
 
 
                 //Add 1 more device to list because no other wifi devices available
-                deviceData.add(new DeviceData("Test1", "8888",
-                        "-50"));
+//                deviceData.add(new DeviceData("Test1", "8888",
+//                        "-50"));
                 //add device to mutable list
                 deviceDataViewModel.addDeviceList(deviceData);
 
@@ -69,13 +71,18 @@ public class WifiBroadcastReciever extends BroadcastReceiver {
                     send.sendDeviceListToServer(deviceData);
 
                 }else{
+                    //Add 1 more device to list because no other wifi devices available
+                    deviceDataViewModel.addDevice(new DeviceData("Test1", "8888",
+                            "-50"));
                     Toast.makeText(context,
                             R.string.no_device_found, Toast.LENGTH_LONG).show();
                 }
         }else{
-            Log.i(TAG, "Found no devices serious problem");
+            Log.e(TAG, "Found no devices serious problem");
             Toast.makeText(context,
                     R.string.no_device_found, Toast.LENGTH_LONG).show();
         }
+
+        context.unregisterReceiver(this);
     }
 }

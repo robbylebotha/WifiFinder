@@ -36,4 +36,12 @@ public class DeviceDataViewModel extends ViewModel {
         mutableDeviceData.setValue(tempDeviceData);
         Log.e(TAG, "Added device to mutable list\n"+mutableDeviceData.getValue().size());
     }
+
+    public int listSize(){
+        return mutableDeviceData.getValue().size();
+    }
+
+    public void clear(){
+        mutableDeviceData.getValue().clear();
+    }
 }
