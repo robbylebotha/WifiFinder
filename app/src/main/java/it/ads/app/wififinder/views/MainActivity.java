@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import it.ads.app.wififinder.Networking.CheckConnectivity;
 import it.ads.app.wififinder.R;
+import it.ads.app.wififinder.WifiScanner;
 import it.ads.app.wififinder.adapters.DeviceRecycleViewAdapter;
 import it.ads.app.wififinder.models.DeviceData;
 import it.ads.app.wififinder.recievers.WifiBroadcastReciever;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     DeviceDataViewModel deviceViewModel;
     DeviceRecycleViewAdapter deviceRecycleViewAdapter;
     MainActivity context;
+    WifiScanner wifiScanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         checkConnectivity = new CheckConnectivity(getApplicationContext());
-
+        wifiScanner = new WifiScanner(context);
 
         //set adapter and observer
         deviceViewModel = ViewModelProviders.of(context).get(DeviceDataViewModel.class);
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             // start broadcast receiver
             wifiReceiver = new WifiBroadcastReciever(wifiManager);
-            scanForWifi();
+//            scanForWifi();
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.i(TAG, "refreshed");
                 scanForWifi();
+                startWifiService();
             }
         });
     }
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     && ActivityCompat.checkSelfPermission(context,
                     Manifest.permission.ACCESS_COARSE_LOCATION) !=
                     PackageManager.PERMISSION_GRANTED ){
+
                 requestPermissions(new String[]{
                                 Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_CODE_ASK_PERMISSIONS);
@@ -112,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
                 registerReceiver(wifiReceiver, intentFilter);
                 wifiManager.startScan();
+                startWifiService();
             }
         }
     }
@@ -121,9 +126,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void startWifiService(){
         Intent intent = new Intent(this, WifiService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000*5, pendingIntent);
         Log.i(TAG, "Service Started");
     }
 
@@ -151,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        startWifiService();
+        startWifiService();
     }
 
     @Override

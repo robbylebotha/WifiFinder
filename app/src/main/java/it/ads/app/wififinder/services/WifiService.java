@@ -11,9 +11,12 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import it.ads.app.wififinder.Networking.SendData;
 import it.ads.app.wififinder.Notifications;
+import it.ads.app.wififinder.models.DeviceData;
 import it.ads.app.wififinder.recievers.WifiBroadcastReciever;
 
 /**
@@ -28,21 +31,39 @@ public class WifiService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        Log.i(TAG, "Service: started onCreate()");
+
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "Service: Ping....");
+                wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         Notifications notification = new Notifications(getApplicationContext());
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        wifiReceiver = new WifiBroadcastReciever(wifiManager);
-        registerReceiver(wifiReceiver, intentFilter);
-        wifiManager.startScan();
+//        wifiReceiver = new WifiBroadcastReciever(wifiManager);
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+//        registerReceiver(wifiReceiver, intentFilter);
+//        wifiManager.startScan();
         Log.e(TAG, "Service: onCreate()");
         List<ScanResult>  results = wifiManager.getScanResults();
         if(!results.isEmpty()){
-            notification.makeNotification(getApplicationContext());
+            notification.makeNotification("Found "+results.size()+" devices");
+            ArrayList<DeviceData> deviceData = new ArrayList<>();
+            for (ScanResult scanResult : results) {
+                Log.i(TAG, "BSSID: "+scanResult.BSSID+"\nName: "+scanResult.SSID
+                        +"\nCap: "+scanResult.capabilities+"\nLevel"+scanResult.level);
+                deviceData.add(new DeviceData(scanResult.SSID, scanResult.BSSID,
+                        String.valueOf(scanResult.level)));
+                SendData send = new SendData(getApplicationContext());
+                send.sendDeviceListToServer(deviceData);
+
+            }
         }else{
             Log.i(TAG, "Service: no results found yet");
         }
-
+        return START_STICKY;
     }
 
     @Nullable
@@ -54,7 +75,6 @@ public class WifiService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(wifiReceiver);
         Log.e(TAG, "Service: onDestroy()");
     }
 

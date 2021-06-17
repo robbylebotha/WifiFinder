@@ -26,11 +26,10 @@ public class WifiScanner implements Scanner {
             Toast.makeText(context, "Turning WiFi ON...", Toast.LENGTH_LONG).show();
             wifiManager.setWifiEnabled(true);
         }else{
+            wifiReceiver = new WifiBroadcastReciever(wifiManager);
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
             context.registerReceiver(wifiReceiver, intentFilter);
-            // start broadcast receiver
-            wifiReceiver = new WifiBroadcastReciever(wifiManager);
             wifiManager.startScan();
 
             Log.i(TAG, "Wifi scanner started");

@@ -15,12 +15,13 @@ import androidx.core.app.NotificationCompat;
  */
 public class Notifications {
     Context context;
+    final String TAG = "8888";
 
     public Notifications(Context context){
         this.context = context;
     }
 
-    public void makeNotification(Context context){
+    public void makeNotification(String message){
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
@@ -32,7 +33,7 @@ public class Notifications {
             notificationChannel.setDescription("Found Wifi Devices");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 0, 0});
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -46,7 +47,7 @@ public class Notifications {
                 .setSmallIcon(it.ads.app.wififinder.R.drawable.ic_wifi)
                 .setTicker("Robby")
                 .setContentTitle("Scan")
-                .setContentText(" Wifi devices found")
+                .setContentText(message)
                 .setContentInfo("Info");
 
         notificationManager.notify(/*notification id*/1, notificationBuilder.build());
