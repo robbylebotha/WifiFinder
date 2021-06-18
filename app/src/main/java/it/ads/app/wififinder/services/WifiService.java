@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -79,7 +78,7 @@ public class WifiService extends Service {
         Log.e(TAG, "Service: onStartCommand()");
         List<ScanResult>  results = wifiManager.getScanResults();
         if(!results.isEmpty()){
-            notification.makeNotification("Found "+results.size()+" devices");
+            notification.makePopupNotification("Found "+results.size()+" devices");
             ArrayList<DeviceData> deviceData = new ArrayList<>();
             for (ScanResult scanResult : results) {
                 Log.i(TAG, "BSSID: "+scanResult.BSSID+"\nName: "+scanResult.SSID

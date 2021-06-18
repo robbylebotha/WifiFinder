@@ -21,7 +21,7 @@ public class Notifications {
         this.context = context;
     }
 
-    public void makeNotification(String message){
+    public void makePopupNotification(String message){
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
@@ -51,6 +51,10 @@ public class Notifications {
                 .setContentInfo("Info");
 
         notificationManager.notify(/*notification id*/1, notificationBuilder.build());
+
+    }
+
+    public void makeServiceNotification(){
 
     }
 }
