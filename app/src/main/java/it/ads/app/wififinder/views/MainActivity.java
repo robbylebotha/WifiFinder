@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
                 registerReceiver(wifiReceiver, intentFilter);
                 wifiManager.startScan();
-                startWifiService();
             }
         }
     }
@@ -174,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        scanForWifi();
+//        scanForWifi();
     }
 
     @Override

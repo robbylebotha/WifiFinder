@@ -39,34 +39,14 @@ public class WifiService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        notification = new Notifications(getApplicationContext());
         Log.i(TAG, "Service: started onCreate()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startMyOwnForeground();
+            startForeground(2, notification.makeServiceNotification());
         }else {
             startForeground(1, new Notification());
         }
 
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void startMyOwnForeground(){
-        String NOTIFICATION_CHANNEL_ID = "it.ads.app.wififinder";
-        String channelName = "Wifi Finder Background Service";
-        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
-        chan.setLightColor(Color.BLUE);
-        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        assert manager != null;
-        manager.createNotificationChannel(chan);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-        Notification notification = notificationBuilder.setOngoing(true)
-                .setSmallIcon(R.drawable.ic_wifi)
-                .setContentTitle("Wifi Finder running in background...")
-                .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .build();
-        startForeground(2, notification);
     }
 
     @Override

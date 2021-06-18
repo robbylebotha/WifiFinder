@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 /**
@@ -54,7 +55,25 @@ public class Notifications {
 
     }
 
-    public void makeServiceNotification(){
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Notification makeServiceNotification(){
+        String NOTIFICATION_CHANNEL_ID = "it.ads.app.wififinder";
+        String channelName = "Wifi Finder Background Service";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
 
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.ic_wifi)
+                .setContentTitle("Wifi Finder running in background...")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+
+        return notification;
     }
 }
